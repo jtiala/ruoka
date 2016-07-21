@@ -1,8 +1,6 @@
 <?php
 
 class MenuDownloader {
-	public $url = null;
-	public $restaurants = array();
 	public $downloadFolder = '../cache';
 	
 	public function __construct() {
