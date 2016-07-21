@@ -1,0 +1,68 @@
+.restaurant-info {
+	width: auto;
+	min-height: 150px;
+	background-color: rgb(63,81,181);
+	color: #FFFFFF;
+	margin-bottom: 10px;
+}
+.restaurant-info .mdl-card--expand {
+	padding-bottom: 0;
+}
+.restaurant-info a {
+	color: #FFFFFF;
+	text-decoration: none;
+}
+.restaurant-info .restaurant-open {
+	padding-top: 6px;
+}
+.restaurant-info .restaurant-open-time {
+	font-size: 0.7em;
+	color: #FFFFFF;
+}
+.restaurant-info .restaurant-open-icon {
+	color: #FFFFFF;
+	margin-right: 5px;
+}
+.menu-set {
+	width: auto;
+	min-height: auto;
+	margin-bottom: 10px;
+	background-color: #F5F5F5;
+}
+.menu-set--vegetable {
+	background-color: #DCEDC8;
+}
+.menu-set--light {
+	background-color: #B3E5FC;
+}
+.menu-set--special {
+	background-color: #FFECB3;
+}
+.menu-set--grill {
+	background-color: #FFCCBC;
+}
+.menu-set .menu-title {
+	padding-bottom: 0;
+}
+.menu-set .menu-price {
+	padding-top: 0;
+	padding-bottom: 0;
+}
+.menu-set .menu-price .mdl-card__title-text {
+	font-size: 1em;
+}
+.menu-set .menu-components .mdl-list {
+	padding: 0;
+	margin: 0;
+}
+.menu-set .menu-components .mdl-list__item {
+	font-size: 1em;
+	font-weight: 300;
+	padding: 10px 0;
+}
+.mdl-mini-footer {
+}
+.mdl-mini-footer .mdl-logo a {
+	color: #FFFFFF;
+	text-decoration: none;
+}
