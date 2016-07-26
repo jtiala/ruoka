@@ -15,7 +15,7 @@ class AmicaMenuDownloader extends MenuDownloader {
 		'0271' => 'aava',
 		'0272' => 'balance'
 	);
-	public $downloadFolder = '../cache/amica/';
+	public $downloadFolder = '../static/data/amica/';
 	
 	public function download() {
 		$currentDay = date('w');

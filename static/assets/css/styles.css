@@ -1,25 +1,58 @@
+.logotype,
+.logotype a {
+	font-family: 'Assistant', sans-serif;
+	font-weight: 400;
+	color: #fff;
+	text-decoration: none;
+}
+.logotype strong {
+	font-weight: 700;
+}
+.navigation {
+	font-family: 'Assistant', sans-serif;
+	font-weight: 200;
+	color: #fff;
+}
+.navigation button {
+	font-family: 'Assistant', sans-serif;
+	font-weight: 200;
+	color: #fff;
+	padding: 0 5px;
+	font-size: 20px;
+	text-transform: none;
+}
+.navigation-dash {
+	margin: 0 5px 0 10px;
+}
 .restaurant-info {
 	width: auto;
-	min-height: 150px;
+	min-height: 100px;
 	background-color: rgb(63,81,181);
 	color: #FFFFFF;
 	margin-bottom: 10px;
 }
 .restaurant-info .mdl-card--expand {
-	padding-bottom: 0;
+	padding: 5px 16px;
 }
 .restaurant-info a {
 	color: #FFFFFF;
 	text-decoration: none;
 }
-.restaurant-info .restaurant-open {
-	padding-top: 6px;
+.restaurant-additional-info {
+	width: auto;
+	min-height: auto;
+	background-color: rgb(63,81,181);
+	margin-top: -5px;
+	margin-bottom: 10px;
 }
-.restaurant-info .restaurant-open-time {
+.restaurant-additional-info .restaurant-open {
+	padding: 10px;
+}
+.restaurant-additional-info .restaurant-open-time {
 	font-size: 0.7em;
 	color: #FFFFFF;
 }
-.restaurant-info .restaurant-open-icon {
+.restaurant-additional-info .restaurant-open-icon {
 	color: #FFFFFF;
 	margin-right: 5px;
 }
@@ -59,6 +92,13 @@
 	font-size: 1em;
 	font-weight: 300;
 	padding: 10px 0;
+	min-height: auto;
+}
+.mdl-card--red {
+	background-color: #d52d28;
+}
+.mdl-card--green {
+	background-color: #348f37;
 }
 .mdl-mini-footer {
 }

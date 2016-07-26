@@ -1,7 +1,7 @@
 <?php
 
 class MenuDownloader {
-	public $downloadFolder = '../cache';
+	public $downloadFolder = '../static/data/';
 	
 	public function __construct() {
 		if (! file_exists($this->downloadFolder)) {

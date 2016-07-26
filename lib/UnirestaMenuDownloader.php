@@ -7,7 +7,7 @@ class UnirestaMenuDownloader extends MenuDownloader {
 	public $restaurants = array(
 		'kastari'
 	);
-	public $downloadFolder = '../cache/uniresta/';
+	public $downloadFolder = '../static/data/uniresta/';
 	
 	public function download() {
 		$currentWeek = date('Y-m-W');
