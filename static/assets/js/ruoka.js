@@ -9,15 +9,30 @@ var RuokaApp = React.createClass({
 			language: 'fi',
 			date: moment(),
 			firstDayOfWeek: moment().startOf('isoweek'),
-			restaurants: {
-				linnanmaa: [
-					{type: 'amica', name: 'centralstation', displayType: 'Amica', displayName: 'Central Station'},
-					{type: 'amica', name: 'stories', displayType: 'Amica', displayName: 'Stories'},
-					{type: 'amica', name: 'datagarage', displayType: 'Amica', displayName: 'Datagarage'},
-					{type: 'amica', name: 'aava', displayType: 'Amica', displayName: 'Aava'},
-					{type: 'amica', name: 'balance', displayType: 'Amica', displayName: 'Balance'}
-				],
+			currentListing: 'linnanmaa',
+			listings: {
+				linnanmaa: {
+					listingTitle: 'Linnanmaan lounaslistat',
+					restaurants: [
+						{type: 'amica', name: 'centralstation', displayType: 'Amica', displayName: 'Central Station'},
+						{type: 'amica', name: 'stories', displayType: 'Amica', displayName: 'Stories'},
+						{type: 'amica', name: 'datagarage', displayType: 'Amica', displayName: 'Datagarage'},
+						{type: 'amica', name: 'aava', displayType: 'Amica', displayName: 'Aava'},
+						{type: 'amica', name: 'balance', displayType: 'Amica', displayName: 'Balance'}
+					]
+				},
 				keskusta: {
+					listingTitle: 'Keskustan lounaslistat',
+					restaurants: [
+						{type: 'amica', name: 'odl-kantakortteli', displayType: 'Amica', displayName: 'ODL Kantakortteli'},
+					]
+				},
+				kontinkangasKaukovainio: {
+					listingTitle: 'Kontinkankaan ja Kaukovainion lounaslistat',
+					restaurants: [
+						{type: 'amica', name: 'alwari', displayType: 'Amica', displayName: 'Alwari'},
+						{type: 'amica', name: 'kotkanpoika-kultturelli', displayType: 'Amica', displayName: 'Kotkanpoika & Kultturelli'},
+					]
 				}
 			}
 		}
@@ -27,14 +42,19 @@ var RuokaApp = React.createClass({
 		state.date = date;
 		this.setState(state);
 	},
+	handleChangeListing: function(listing) {
+		var state = this.state;
+		state.currentListing = listing;
+		this.setState(state);
+	},
 	render: function() {
 		return (
 			<div className="mdl-layout mdl-js-layout mdl-layout--fixed-header"> 
-				<Header appUrl={this.props.appUrl} date={this.state.date} language={this.state.language} onChangeDate={this.handleChangeDate} />
+				<Header appUrl={this.props.appUrl} date={this.state.date} language={this.state.language} listings={this.state.listings} currentListing={this.state.currentListing} onChangeDate={this.handleChangeDate} onChangeListing={this.handleChangeListing} />
 				<main className="mdl-layout__content">
 					<div className="page-content">
 						<div className="mdl-grid">
-							{this.state.restaurants.linnanmaa.map(function(restaurant) {
+							{this.state.listings[this.state.currentListing].restaurants.map(function(restaurant) {
 								return <Restaurant key={restaurant.name} language={this.state.language} date={this.state.date} firstDayOfWeek={this.state.firstDayOfWeek} type={restaurant.type} name={restaurant.name} displayType={restaurant.displayType} displayName={restaurant.displayName} />
 							}.bind(this))}
 						</div>
@@ -59,6 +79,9 @@ var Header = React.createClass({
 	nextDate: function() {
 		this.props.onChangeDate(this.props.date.add(1, 'days'));
 	},
+	changeListing: function(listing) {
+		this.props.onChangeListing(listing);
+	},
 	render: function() {
 		return (
 			<header className="mdl-layout__header">
@@ -67,19 +90,22 @@ var Header = React.createClass({
 						<span className="logotype"><a href={this.props.appUrl}><strong>Ruoka</strong>.kitchen</a></span>
 						<span className="navigation">
 							<span className="navigation-dash">&#8212;</span>
-							<span className="navigation-area">
-								<button id="navigation-area-button" className="mdl-button mdl-js-button">
+							<span className="navigation-listing">
+								<button id="navigation-listing-button" className="mdl-button mdl-js-button">
 									<i className="material-icons">keyboard_arrow_down</i>
-									<span className="navigation-area-name">Linnanmaan lounaslistat</span>
+									<span className="navigation-listing-name">{this.props.listings[this.props.currentListing].listingTitle}</span>
 								</button>
-								<ul className="mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" htmlFor="navigation-area-button">
-									<li className="mdl-menu__item">Linnanmaan lounaslistat</li>
-									<li className="mdl-menu__item">Keskustan lounaslistat</li>
+								<ul className="mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" htmlFor="navigation-listing-button">
+								{Object.keys(this.props.listings).map(function(listing) {
+									return (
+										<li className="mdl-menu__item" key={listing} onClick={this.changeListing.bind(this, listing)}>{this.props.listings[listing].listingTitle}</li>
+									)
+								}.bind(this))}
 								</ul>
 							</span>
 							<span className="navigation-date">
 								<button onClick={this.prevDate} className="mdl-button mdl-js-button mdl-button--icon"><i className="material-icons">keyboard_arrow_left</i></button>
-								<button id="navigation-area-button" className="mdl-button mdl-js-button">
+								<button id="navigation-listing-button" className="mdl-button mdl-js-button">
 									<span className="navigation-date-date">{this.props.date.locale(this.props.language).format('dd D.M.')}</span>
 								</button>
 								<button onClick={this.nextDate} className="mdl-button mdl-js-button mdl-button--icon"><i className="material-icons">keyboard_arrow_right</i></button>
