@@ -1,7 +1,19 @@
 var RuokaApp = React.createClass({
 	getDefaultProps: function() {
 		return {
-			appUrl: 'http://dev.ruoka.kitchen'
+			appUrl: 'http://dev.ruoka.kitchen',
+			languages: {
+				fi: {
+					name: 'Suomi',
+					inLanguage: 'Suomeksi',
+					link: '/'
+				},
+				en: {
+					name: 'English',
+					inLanguage: 'In English',
+					link: '/en'
+				}
+			}
 		}
 	},
 	getInitialState: function() {
@@ -37,9 +49,19 @@ var RuokaApp = React.createClass({
 			}
 		}
 	},
+	componentWillMount: function() {
+		this.updateStateFromHash();
+		this.updateBrowserTitle();
+		this.updateBrowserHash();
+	},
+	componentDidUpdate: function() {
+		this.updateBrowserTitle();
+		this.updateBrowserHash();
+	},
 	handleChangeDate: function(date) {
 		var state = this.state;
-		state.date = date;
+		state.date = moment(date);
+		state.firstDayOfWeek = moment(date).startOf('isoweek');
 		this.setState(state);
 	},
 	handleChangeListing: function(listing) {
@@ -47,10 +69,48 @@ var RuokaApp = React.createClass({
 		state.currentListing = listing;
 		this.setState(state);
 	},
+	handleChangeLanguage: function(language) {
+		var state = this.state;
+		state.language = language;
+		this.setState(state);
+	},
+	updateBrowserTitle: function() {
+		var title = this.state.listings[this.state.currentListing].listingTitle + ', ' + this.state.date.format('dd D.M.') + ' - Ruoka.kitchen';
+		document.title = title;
+	},
+	updateBrowserHash: function() {
+		var hash = '#' + this.state.language + '/' + this.state.currentListing + '/' + this.state.date.format('YYYY-MM-DD');
+		location.hash = hash;
+	},
+	updateStateFromHash: function() {
+		var hash = location.hash.replace('#', '');
+		var state = this.state;
+
+		if (hash.length) {
+			var parts = hash.split('/');
+			
+			switch (parts.length) {
+				case 3:
+					if (parts[2].length == 10) {
+						state.date = moment(parts[2], 'YYYY-MM-DD');
+					}
+				case 2:
+					if (Object.keys(this.state.listings).indexOf(parts[1]) > -1) {
+						state.currentListing = parts[1];
+					}
+				case 1:
+					if (Object.keys(this.props.languages).indexOf(parts[0]) > -1) {
+						state.language = parts[0];
+					}
+			}
+		}
+
+		this.setState(state);
+	},
 	render: function() {
 		return (
 			<div className="mdl-layout mdl-js-layout mdl-layout--fixed-header"> 
-				<Header appUrl={this.props.appUrl} date={this.state.date} language={this.state.language} listings={this.state.listings} currentListing={this.state.currentListing} onChangeDate={this.handleChangeDate} onChangeListing={this.handleChangeListing} />
+				<Header appUrl={this.props.appUrl} date={this.state.date} firstDayOfWeek={this.state.firstDayOfWeek} language={this.state.language} listings={this.state.listings} currentListing={this.state.currentListing} onChangeDate={this.handleChangeDate} onChangeListing={this.handleChangeListing} />
 				<main className="mdl-layout__content">
 					<div className="page-content">
 						<div className="mdl-grid">
@@ -59,7 +119,7 @@ var RuokaApp = React.createClass({
 							}.bind(this))}
 						</div>
 					</div>
-					<Footer appUrl={this.props.appUrl} />
+					<Footer language={this.state.language} languages={this.props.languages} appUrl={this.props.appUrl} />
 				</main>
 			</div>
 		)
@@ -73,16 +133,19 @@ var Header = React.createClass({
 	componentDidUpdate: function() {
 		componentHandler.upgradeDom();
 	},
-	prevDate: function() {
-		this.props.onChangeDate(this.props.date.add(-1, 'days'));
-	},
-	nextDate: function() {
-		this.props.onChangeDate(this.props.date.add(1, 'days'));
+	changeDate: function(date) {
+		this.props.onChangeDate(date);
 	},
 	changeListing: function(listing) {
 		this.props.onChangeListing(listing);
 	},
 	render: function() {
+		var dates = [];
+		for (var i = 0; i < 7; i++) {
+			var date = moment(this.props.firstDayOfWeek).add(i, 'days');
+			dates.push(date);
+		}
+		
 		return (
 			<header className="mdl-layout__header">
 				<div className="mdl-layout__header-row">
@@ -97,18 +160,31 @@ var Header = React.createClass({
 								</button>
 								<ul className="mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" htmlFor="navigation-listing-button">
 								{Object.keys(this.props.listings).map(function(listing) {
+									var text = this.props.listings[listing].listingTitle;
+									
+									if (this.props.currentListing == listing) {
+										text = <strong>{text}</strong>;
+									}
+									
 									return (
-										<li className="mdl-menu__item" key={listing} onClick={this.changeListing.bind(this, listing)}>{this.props.listings[listing].listingTitle}</li>
+										<li className="mdl-menu__item" key={'listing-' + listing} onClick={this.changeListing.bind(this, listing)}>{text}</li>
 									)
 								}.bind(this))}
 								</ul>
 							</span>
 							<span className="navigation-date">
-								<button onClick={this.prevDate} className="mdl-button mdl-js-button mdl-button--icon"><i className="material-icons">keyboard_arrow_left</i></button>
-								<button id="navigation-listing-button" className="mdl-button mdl-js-button">
+								<button onClick={this.changeDate.bind(this, moment(this.props.date).add(-1, 'days'))} className="mdl-button mdl-js-button mdl-button--icon"><i className="material-icons">keyboard_arrow_left</i></button>
+								<button id="navigation-date-button" className="mdl-button mdl-js-button">
 									<span className="navigation-date-date">{this.props.date.locale(this.props.language).format('dd D.M.')}</span>
 								</button>
-								<button onClick={this.nextDate} className="mdl-button mdl-js-button mdl-button--icon"><i className="material-icons">keyboard_arrow_right</i></button>
+								<ul className="mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" htmlFor="navigation-date-button">
+								{dates.map(function(date) {
+									return (
+										<li className="mdl-menu__item" key={'date-' + date.format('YYYY-MM-DD')} onClick={this.changeDate.bind(this, date.format('YYYY-MM-DD'))}>{date.locale(this.props.language).format('dd D.M.')}</li>
+									)
+								}.bind(this))}
+								</ul>
+								<button onClick={this.changeDate.bind(this, moment(this.props.date).add(1, 'days'))} className="mdl-button mdl-js-button mdl-button--icon"><i className="material-icons">keyboard_arrow_right</i></button>
 							</span>
 						</span>
 					</span>
@@ -120,6 +196,12 @@ var Header = React.createClass({
 
 var Footer = React.createClass({
 	render: function() {
+		if (this.props.language == 'en') {
+			var changeLanguageLink = <a href={this.props.appUrl + this.props.languages['fi'].link}>{this.props.languages['fi'].inLanguage}</a>;
+		} else {
+			var changeLanguageLink = <a href={this.props.appUrl + this.props.languages['en'].link}>{this.props.languages['en'].inLanguage}</a>;
+		}
+
 		return (
 			<footer className="mdl-mini-footer">
 				<div className="mdl-mini-footer__left-section">
@@ -127,7 +209,7 @@ var Footer = React.createClass({
 						<span className="logotype"><a href={this.props.appUrl}><strong>Ruoka</strong>.kitchen</a></span>
 					</div>
 					<ul className="mdl-mini-footer__link-list">
-						<li><a href="/en">In English</a></li>
+						<li>{changeLanguageLink}</li>
 						<li><a href="http://github.com/jtiala/ruoka">GitHub</a></li>
 					</ul>
 				</div>
@@ -247,7 +329,7 @@ var Restaurant = React.createClass({
 										var set = {
 											type: type,
 											name: setMenu.Name,
-											price: setMenu.Price,
+											price: setMenu.Price.replace(/€\/ /g, '€ / ').replace(/ €/g, '€'),
 											components: components
 										};
 
