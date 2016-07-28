@@ -1,3 +1,16 @@
+var translations = {
+	fi: {
+		closed: 'Suljettu'
+	},
+	en: {
+		closed: 'Closed'
+	}
+}
+
+var translate = function(name, language) {
+	return translations[language][name];
+};
+
 var RuokaApp = React.createClass({
 	getDefaultProps: function() {
 		return {
@@ -24,32 +37,52 @@ var RuokaApp = React.createClass({
 			currentListing: 'linnanmaa',
 			listings: {
 				linnanmaa: {
-					listingTitle: 'Linnanmaan lounaslistat',
+					fi: {
+						title: 'Linnanmaan lounaslistat'
+					},
+					en: {
+						title: 'Lunch menus at Linnanmaa'
+					},
 					restaurants: [
-						{type: 'amica', name: 'centralstation', displayType: 'Amica', displayName: 'Central Station'},
-						{type: 'amica', name: 'stories', displayType: 'Amica', displayName: 'Stories'},
-						{type: 'amica', name: 'datagarage', displayType: 'Amica', displayName: 'Datagarage'},
-						{type: 'amica', name: 'aava', displayType: 'Amica', displayName: 'Aava'},
-						{type: 'amica', name: 'balance', displayType: 'Amica', displayName: 'Balance'}
+						{type: 'amica', name: 'centralstation', fi: {type: 'Amica', name: 'Central Station'}, en: {type: 'Amica', name: 'Central Station'}},
+						{type: 'amica', name: 'stories', fi: {type: 'Amica', name: 'Stories'}, en: {type: 'Amica', name: 'Stories'}},
+						{type: 'amica', name: 'datagarage', fi: {type: 'Amica', name: 'Datagarage'}, en: {type: 'Amica', name: 'Datagarage'}},
+						{type: 'amica', name: 'aava', fi: {type: 'Amica', name: 'Aava'}, en: {type: 'Amica', name: 'Aava'}},
+						{type: 'amica', name: 'balance', fi: {type: 'Amica', name: 'Balance'}, en: {type: 'Amica', name: 'Balance'}}
 					]
 				},
 				keskusta: {
-					listingTitle: 'Keskustan lounaslistat',
+					fi: {
+						title: 'Keskustan lounaslistat'
+					},
+					en: {
+						title: 'Lunch menus at Downtown'
+					},
 					restaurants: [
-						{type: 'amica', name: 'odl-kantakortteli', displayType: 'Amica', displayName: 'ODL Kantakortteli'},
+						{type: 'amica', name: 'odl-kantakortteli', fi: {type: 'Amica', name: 'ODL Kantakortteli'}, en: {type: 'Amica', name: 'ODL Kantakortteli'}}
 					]
 				},
 				kontinkangasKaukovainio: {
-					listingTitle: 'Kontinkankaan ja Kaukovainion lounaslistat',
+					fi: {
+						title: 'Kontinkankaan & Kaukovainion lounaslistat'
+					},
+					en: {
+						title: 'Lunch menus at Kontinkangas & Kaukovainio'
+					},
 					restaurants: [
-						{type: 'amica', name: 'alwari', displayType: 'Amica', displayName: 'Alwari'},
-						{type: 'amica', name: 'kotkanpoika-kultturelli', displayType: 'Amica', displayName: 'Kotkanpoika & Kultturelli'},
+						{type: 'amica', name: 'alwari', fi: {type: 'Amica', name: 'Alwari'}, en: {type: 'Amica', name: 'Alwari'}},
+						{type: 'amica', name: 'kotkanpoika-kultturelli', fi: {type: 'Amica', name: 'Kotkanpoika & Kultturelli'}, en: {type: 'Amica', name: 'Kotkanpoika & Kultturelli'}},
 					]
 				},
 				teknologiakyla: {
-					listingTitle: 'Teknologiakylä',
+					fi: {
+						title: 'Teknologiakylän lounaslistat'
+					},
+					en: {
+						title: 'Lunch menus at Tecnology Village'
+					},
 					restaurants: [
-						{type: 'amica', name: 'smarthouse', displayType: 'Amica', displayName: 'Smarthouse'}
+						{type: 'amica', name: 'smarthouse', fi: {type: 'Amica', name: 'Smarthouse'}, en: {type: 'Amica', name: 'Smarthouse'}}
 					]
 				}
 			}
@@ -58,7 +91,6 @@ var RuokaApp = React.createClass({
 	componentWillMount: function() {
 		this.updateStateFromHash();
 		this.updateBrowserTitle();
-		this.updateBrowserHash();
 	},
 	componentDidUpdate: function() {
 		this.updateBrowserTitle();
@@ -121,7 +153,7 @@ var RuokaApp = React.createClass({
 					<div className="page-content">
 						<div className="mdl-grid">
 							{this.state.listings[this.state.currentListing].restaurants.map(function(restaurant) {
-								return <Restaurant key={restaurant.name} language={this.state.language} date={this.state.date} firstDayOfWeek={this.state.firstDayOfWeek} type={restaurant.type} name={restaurant.name} displayType={restaurant.displayType} displayName={restaurant.displayName} />
+								return <Restaurant key={restaurant.name} language={this.state.language} date={this.state.date} firstDayOfWeek={this.state.firstDayOfWeek} details={restaurant} />
 							}.bind(this))}
 						</div>
 					</div>
@@ -146,7 +178,9 @@ var Header = React.createClass({
 		this.props.onChangeListing(listing);
 	},
 	render: function() {
+		var frontPageLink = this.props.appUrl + '/' + this.props.language;
 		var dates = [];
+
 		for (var i = 0; i < 7; i++) {
 			var date = moment(this.props.firstDayOfWeek).add(i, 'days');
 			dates.push(date);
@@ -156,17 +190,17 @@ var Header = React.createClass({
 			<header className="mdl-layout__header">
 				<div className="mdl-layout__header-row">
 					<span className="mdl-layout-title">
-						<span className="logotype"><a href={this.props.appUrl}><strong>Ruoka</strong>.kitchen</a></span>
+						<span className="logotype"><a href={frontPageLink}><strong>Ruoka</strong>.kitchen</a></span>
 						<span className="navigation">
 							<span className="navigation-dash">&#8212;</span>
 							<span className="navigation-listing">
 								<button id="navigation-listing-button" className="mdl-button mdl-js-button">
 									<i className="material-icons">keyboard_arrow_down</i>
-									<span className="navigation-listing-name">{this.props.listings[this.props.currentListing].listingTitle}</span>
+									<span className="navigation-listing-name">{this.props.listings[this.props.currentListing][this.props.language].title}</span>
 								</button>
 								<ul className="mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" htmlFor="navigation-listing-button">
 								{Object.keys(this.props.listings).map(function(listing) {
-									var text = this.props.listings[listing].listingTitle;
+									var text = this.props.listings[listing][this.props.language].title;
 									
 									if (this.props.currentListing == listing) {
 										text = <strong>{text}</strong>;
@@ -230,9 +264,7 @@ var Restaurant = React.createClass({
 			language: null,
 			date: null,
 			firstDayOfWeek: null,
-			type: null,
-			name: null,
-			displayName: null
+			details: null
 		};
 	},
 	getInitialState: function() {
@@ -248,16 +280,16 @@ var Restaurant = React.createClass({
 	componentDidMount: function() {
 		var state = this.getInitialState();
 
-		switch (this.props.type) {
+		switch (this.props.details.type) {
 			case 'amica':
 				state.dataType = 'json';
 				state.dataDir = 'data/amica/';
-				state.dataFile = state.dataDir + this.props.firstDayOfWeek.format('YYYY-MM-DD') + '_' + this.props.language + '_' + this.props.name + '.json';
+				state.dataFile = state.dataDir + this.props.firstDayOfWeek.format('YYYY-MM-DD') + '_' + this.props.language + '_' + this.props.details.name + '.json';
 				break;
 			case 'uniresta':
 				state.dataType = 'xml';
 				state.dataDir = 'data/uniresta/';
-				state.dataFile = state.dataDir + this.props.firstDayOfWeek.format('YYYY-MM-DD') + '_' + this.props.language + '_' + this.props.name + '.xml';
+				state.dataFile = state.dataDir + this.props.firstDayOfWeek.format('YYYY-MM-DD') + '_' + this.props.language + '_' + this.props.details.name + '.xml';
 				break;
 		}
 
@@ -381,7 +413,7 @@ var Restaurant = React.createClass({
 		var i = 0;
 
 		if (! this.state.lunchTime || typeof this.state.lunchTime == 'undefined' || this.state.lunchTime.length < 1) {
-			var lunchTime = 'Suljettu';
+			var lunchTime = translate('closed', this.props.language);
 			var lunchTimeCardClass = 'mdl-card mdl-shadow--2dp restaurant-additional-info mdl-card--red';
 		} else {
 			var lunchTime = this.state.lunchTime;
@@ -392,7 +424,7 @@ var Restaurant = React.createClass({
 			<div className="mdl-cell mdl-cell--2-col mdl-cell--4-col-tablet mdl-cell--12-col-phone">
 				<div className="mdl-card mdl-shadow--2dp restaurant-info">
 					<div className="mdl-card__title mdl-card--expand">
-						<h3 className="mdl-card__title-text"><a href={this.state.url}><small>{this.props.displayType}</small><br />{this.props.displayName}</a></h3>
+						<h3 className="mdl-card__title-text"><a href={this.state.url}><small>{this.props.details[this.props.language].type}</small><br />{this.props.details[this.props.language].name}</a></h3>
 					</div>
 				</div>
 				<div className={lunchTimeCardClass}>
