@@ -45,6 +45,12 @@ var RuokaApp = React.createClass({
 						{type: 'amica', name: 'alwari', displayType: 'Amica', displayName: 'Alwari'},
 						{type: 'amica', name: 'kotkanpoika-kultturelli', displayType: 'Amica', displayName: 'Kotkanpoika & Kultturelli'},
 					]
+				},
+				teknologiakyla: {
+					listingTitle: 'Teknologiakylä',
+					restaurants: [
+						{type: 'amica', name: 'smarthouse', displayType: 'Amica', displayName: 'Smarthouse'}
+					]
 				}
 			}
 		}
@@ -292,7 +298,9 @@ var Restaurant = React.createClass({
 									menus.SetMenus.forEach(function(setMenu) {
 										if (
 											setMenu.Name.toLowerCase().indexOf('kasvis') > -1 ||
-											setMenu.Name.toLowerCase().indexOf('vegetable') > -1
+											setMenu.Name.toLowerCase().indexOf('vegetable') > -1 ||
+											setMenu.Name.toLowerCase().indexOf('salaatti') > -1 ||
+											setMenu.Name.toLowerCase().indexOf('salad') > -1
 										) {
 											var type = 'vegetarianLunch';
 										} else if (
@@ -303,7 +311,10 @@ var Restaurant = React.createClass({
 										} else if (
 											setMenu.Name.toLowerCase().indexOf('grill') > -1 ||
 											setMenu.Name.toLowerCase().indexOf('erikois') > -1 ||
-											setMenu.Name.toLowerCase().indexOf('portion') > -1
+											setMenu.Name.toLowerCase().indexOf('portion') > -1 ||
+											setMenu.Name.toLowerCase().indexOf('pitsa') > -1 ||
+											setMenu.Name.toLowerCase().indexOf('pizza') > -1 ||
+											setMenu.Name.toLowerCase().indexOf('bizza') > -1
 										) {
 											var type = 'grillLunch';
 										} else if (
@@ -311,6 +322,11 @@ var Restaurant = React.createClass({
 											setMenu.Name.toLowerCase().indexOf('special') > -1
 										) {
 											var type = 'specialLunch';
+										} else if (
+											setMenu.Name.toLowerCase().indexOf('jälki') > -1 ||
+											setMenu.Name.toLowerCase().indexOf('dessert') > -1
+										) {
+											var type = 'dessert';
 										} else {
 											var type = 'lunch'
 										}
@@ -326,10 +342,16 @@ var Restaurant = React.createClass({
 											});
 										}
 
+										if (setMenu.Price) {
+											var price = setMenu.Price.replace(/€\/ /g, '€ / ').replace(/ €/g, '€');
+										} else {
+											var price = null;
+										}
+										
 										var set = {
 											type: type,
 											name: setMenu.Name,
-											price: setMenu.Price.replace(/€\/ /g, '€ / ').replace(/ €/g, '€'),
+											price: price,
 											components: components
 										};
 
@@ -408,6 +430,9 @@ var MenuSet = React.createClass({
 				break;
 			case 'grillLunch':
 				state.cssClasses += ' menu-set--grill';
+				break;
+			case 'dessert':
+				state.cssClasses += ' menu-set--dessert';
 				break;
 		}
 

@@ -19,7 +19,9 @@ class AmicaMenuDownloader extends MenuDownloader {
 		'1694' => 'odl-kantakortteli',
 		//Kontinkangas & Kaukovainio
 		'0226' => 'alwari',
-		'0235' => 'kotkanpoika-kultturelli'
+		'0235' => 'kotkanpoika-kultturelli',
+		//Teknologiakylä
+		'3498' => 'smarthouse'
 	);
 	public $downloadFolder = '../static/data/amica/';
 	

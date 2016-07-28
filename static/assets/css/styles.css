@@ -74,6 +74,9 @@
 .menu-set--grill {
 	background-color: #FFCCBC;
 }
+.menu-set--dessert {
+	background-color: #ECC8ED;
+}
 .menu-set .menu-title {
 	padding-bottom: 0;
 }
