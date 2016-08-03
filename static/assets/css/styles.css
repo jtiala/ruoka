@@ -20,6 +20,11 @@
 	padding: 0 5px;
 	font-size: 20px;
 	text-transform: none;
+	text-align: left;
+	min-width: auto;
+}
+.navigation-logo {
+	cursor: pointer;
 }
 .navigation-dash {
 	margin: 0 5px 0 10px;
@@ -45,11 +50,14 @@
 	margin-top: -5px;
 	margin-bottom: 10px;
 }
+.restaurant-additional-info small {
+	font-size: 0.7em;
+	color: #FFFFFF;
+}
 .restaurant-additional-info .restaurant-open {
 	padding: 10px;
 }
 .restaurant-additional-info .restaurant-open-time {
-	font-size: 0.7em;
 	color: #FFFFFF;
 }
 .restaurant-additional-info .restaurant-open-icon {
@@ -77,6 +85,9 @@
 .menu-set--dessert {
 	background-color: #ECC8ED;
 }
+.menu-set--breakfast {
+	background-color: #FFDDB3;
+}
 .menu-set .menu-title {
 	padding-bottom: 0;
 }
@@ -97,15 +108,60 @@
 	padding: 10px 0;
 	min-height: auto;
 }
+.mdl-card--grey {
+	background-color: #696969;
+}
+.mdl-card--slateblue {
+	background-color: #4a5177;
+}
 .mdl-card--red {
 	background-color: #d52d28;
 }
 .mdl-card--green {
 	background-color: #348f37;
 }
-.mdl-mini-footer {
-}
 .mdl-mini-footer .mdl-logo a {
 	color: #FFFFFF;
 	text-decoration: none;
+}
+.mdl-layout__header-row {
+		padding: 0 16px;
+	}
+
+@media only screen and (max-device-width: 839px) {
+	.navigation-dash {
+		display: none;
+	}
+}
+
+@media only screen and (max-device-width: 639px) {
+	.mdl-layout-title {
+		width: 100%;
+	}
+	.mdl-layout__header-row {
+		height: 80px;
+		padding: 2px 16px;
+	}
+	.navigation-logo {
+		display: block;
+		position: absolute;
+		top: -12px;
+		left: 0;
+	}
+	.navigation-listing {
+		display: block;
+		position: relative;
+		top: 17px;
+		left: -10px;
+	}
+	.navigation-date {
+		display: block;
+		position: absolute;
+		top: -20px;
+		right: -10px;
+	}
+	.navigation button {
+		padding: 0 5px;
+		font-size: 16px;
+	}
 }

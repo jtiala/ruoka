@@ -1,15 +1,39 @@
 var translations = {
 	fi: {
-		closed: 'Suljettu'
+		closed: 'Suljettu',
+		menuUnavailable: 'Menu ei saatavissa.',
+		menuDownloadError: 'Menua ei voitu ladata.'
 	},
 	en: {
-		closed: 'Closed'
+		closed: 'Closed',
+		menuUnavailable: 'Menu unavailable.',
+		menuDownloadError: 'Menu could not be downloaded.'
 	}
 }
 
 var translate = function(name, language) {
-	return translations[language][name];
+	if (translations[language] instanceof Object && typeof translations[language][name] == 'string') {
+		return translations[language][name];
+	}
+
+	return name;
 };
+
+var stringContains = function(string, contains) {
+	var ret = false;
+
+	if (! contains instanceof Array) {
+		contains = [contains];
+	}
+
+	contains.forEach(function(c) {
+		if (string.toLowerCase().indexOf(c.toLowerCase()) > -1) {
+			ret = true;
+		}
+	});
+
+	return ret;
+}
 
 var RuokaApp = React.createClass({
 	getDefaultProps: function() {
@@ -48,7 +72,8 @@ var RuokaApp = React.createClass({
 						{type: 'amica', name: 'stories', fi: {type: 'Amica', name: 'Stories'}, en: {type: 'Amica', name: 'Stories'}},
 						{type: 'amica', name: 'datagarage', fi: {type: 'Amica', name: 'Datagarage'}, en: {type: 'Amica', name: 'Datagarage'}},
 						{type: 'amica', name: 'aava', fi: {type: 'Amica', name: 'Aava'}, en: {type: 'Amica', name: 'Aava'}},
-						{type: 'amica', name: 'balance', fi: {type: 'Amica', name: 'Balance'}, en: {type: 'Amica', name: 'Balance'}}
+						{type: 'amica', name: 'balance', fi: {type: 'Amica', name: 'Balance'}, en: {type: 'Amica', name: 'Balance'}},
+						{type: 'uniresta', name: 'kastari', fi: {type: 'Uniresta', name: 'Kastari'}, en: {type: 'Uniresta', name: 'Kastari'}}
 					]
 				},
 				keskusta: {
@@ -59,7 +84,9 @@ var RuokaApp = React.createClass({
 						title: 'Lunch menus at Downtown'
 					},
 					restaurants: [
-						{type: 'amica', name: 'odl-kantakortteli', fi: {type: 'Amica', name: 'ODL Kantakortteli'}, en: {type: 'Amica', name: 'ODL Kantakortteli'}}
+						{type: 'amica', name: 'odl-kantakortteli', fi: {type: 'Amica', name: 'ODL Kantakortteli'}, en: {type: 'Amica', name: 'ODL Kantakortteli'}},
+						{type: 'uniresta', name: 'vanilla', fi: {type: 'Uniresta', name: 'Vanilla'}, en: {type: 'Uniresta', name: 'Vanilla'}},
+						{type: 'uniresta', name: 'preludi', fi: {type: 'Uniresta', name: 'Preludi'}, en: {type: 'Uniresta', name: 'Preludi'}}
 					]
 				},
 				kontinkangasKaukovainio: {
@@ -72,6 +99,8 @@ var RuokaApp = React.createClass({
 					restaurants: [
 						{type: 'amica', name: 'alwari', fi: {type: 'Amica', name: 'Alwari'}, en: {type: 'Amica', name: 'Alwari'}},
 						{type: 'amica', name: 'kotkanpoika-kultturelli', fi: {type: 'Amica', name: 'Kotkanpoika & Kultturelli'}, en: {type: 'Amica', name: 'Kotkanpoika & Kultturelli'}},
+						{type: 'uniresta', name: 'medisiina', fi: {type: 'Uniresta', name: 'Medisiina'}, en: {type: 'Uniresta', name: 'Medisiina'}},
+						{type: 'uniresta', name: 'castanea', fi: {type: 'Uniresta', name: 'Castanea'}, en: {type: 'Uniresta', name: 'Castanea'}}
 					]
 				},
 				teknologiakyla: {
@@ -113,7 +142,7 @@ var RuokaApp = React.createClass({
 		this.setState(state);
 	},
 	updateBrowserTitle: function() {
-		var title = this.state.listings[this.state.currentListing].listingTitle + ', ' + this.state.date.format('dd D.M.') + ' - Ruoka.kitchen';
+		var title = this.state.listings[this.state.currentListing][this.state.language].title + ', ' + this.state.date.locale(this.state.language).format('dd D.M.') + ' - Ruoka.kitchen';
 		document.title = title;
 	},
 	updateBrowserHash: function() {
@@ -156,11 +185,27 @@ var RuokaApp = React.createClass({
 								return <Restaurant key={restaurant.name} language={this.state.language} date={this.state.date} firstDayOfWeek={this.state.firstDayOfWeek} details={restaurant} />
 							}.bind(this))}
 						</div>
+						<Ad />
 					</div>
 					<Footer language={this.state.language} languages={this.props.languages} appUrl={this.props.appUrl} />
 				</main>
 			</div>
 		)
+	}
+});
+
+var Ad = React.createClass({
+	componentDidMount: function() {
+		(adsbygoogle = window.adsbygoogle || []).push({});
+	},
+	render: function() {
+		return (
+			<div className="mdl-grid">
+				<div className="mdl-cell mdl-cell--12-col" style={{height: '100px'}}>
+					<ins className="adsbygoogle" style={{display: 'block'}} data-ad-client="ca-pub-5168656039974650" data-ad-slot="3755321464" data-ad-format="auto"></ins>
+				</div>
+			</div>
+		);
 	}
 });
 
@@ -178,7 +223,6 @@ var Header = React.createClass({
 		this.props.onChangeListing(listing);
 	},
 	render: function() {
-		var frontPageLink = this.props.appUrl + '/' + this.props.language;
 		var dates = [];
 
 		for (var i = 0; i < 7; i++) {
@@ -190,8 +234,8 @@ var Header = React.createClass({
 			<header className="mdl-layout__header">
 				<div className="mdl-layout__header-row">
 					<span className="mdl-layout-title">
-						<span className="logotype"><a href={frontPageLink}><strong>Ruoka</strong>.kitchen</a></span>
 						<span className="navigation">
+							<span className="navigation-logo logotype" onClick={this.changeDate}><strong>Ruoka</strong>.kitchen</span>
 							<span className="navigation-dash">&#8212;</span>
 							<span className="navigation-listing">
 								<button id="navigation-listing-button" className="mdl-button mdl-js-button">
@@ -219,8 +263,14 @@ var Header = React.createClass({
 								</button>
 								<ul className="mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" htmlFor="navigation-date-button">
 								{dates.map(function(date) {
+									var text = date.locale(this.props.language).format('dd D.M.');
+									
+									if (date.isSame(this.props.date, 'day')) {
+										text = <strong>{text}</strong>;
+									}
+									
 									return (
-										<li className="mdl-menu__item" key={'date-' + date.format('YYYY-MM-DD')} onClick={this.changeDate.bind(this, date.format('YYYY-MM-DD'))}>{date.locale(this.props.language).format('dd D.M.')}</li>
+										<li className="mdl-menu__item" key={'date-' + date.format('YYYY-MM-DD')} onClick={this.changeDate.bind(this, date.format('YYYY-MM-DD'))}>{text}</li>
 									)
 								}.bind(this))}
 								</ul>
@@ -270,10 +320,10 @@ var Restaurant = React.createClass({
 	getInitialState: function() {
 		return {
 			url: null,
-			lunchTime: null,
 			dataType: null,
 			dataDir: null,
 			dataFile: null,
+			info: [],
 			menuSets: []
 		}
 	},
@@ -287,9 +337,9 @@ var Restaurant = React.createClass({
 				state.dataFile = state.dataDir + this.props.firstDayOfWeek.format('YYYY-MM-DD') + '_' + this.props.language + '_' + this.props.details.name + '.json';
 				break;
 			case 'uniresta':
-				state.dataType = 'xml';
+				state.dataType = 'json';
 				state.dataDir = 'data/uniresta/';
-				state.dataFile = state.dataDir + this.props.firstDayOfWeek.format('YYYY-MM-DD') + '_' + this.props.language + '_' + this.props.details.name + '.xml';
+				state.dataFile = state.dataDir + this.props.firstDayOfWeek.format('YYYY-MM-DD') + '_' + this.props.details.name + '.json';
 				break;
 		}
 
@@ -304,135 +354,266 @@ var Restaurant = React.createClass({
 			dataType: this.state.dataType,
 			cache: false,
 			success: function(data) {
-				var state = this.state;
-				var stateNeedsUpdate = false;
-
-				if (data.MenusForDays instanceof Array) {
-					if (data.RestaurantUrl && data.RestaurantUrl !== state.url) {
-						state.url = data.RestaurantUrl;
-						stateNeedsUpdate = true;
-					}
-				
-					if (data.MenusForDays instanceof Array) {
-						data.MenusForDays.forEach(function(menus) {
-							var menuDate = moment(menus.Date);
-							var currentDate = this.props.date;
-	
-							if (menuDate.isSame(currentDate, 'day')) {
-								if (menus.LunchTime && menus.LunchTime !== state.lunchTime) {
-									state.lunchTime = menus.LunchTime;
-									stateNeedsUpdate = true;
-								}
-	
-								if (menus.SetMenus instanceof Array) {
-									var menuSets = [];
-									
-									menus.SetMenus.forEach(function(setMenu) {
-										if (
-											setMenu.Name.toLowerCase().indexOf('kasvis') > -1 ||
-											setMenu.Name.toLowerCase().indexOf('vegetable') > -1 ||
-											setMenu.Name.toLowerCase().indexOf('salaatti') > -1 ||
-											setMenu.Name.toLowerCase().indexOf('salad') > -1
-										) {
-											var type = 'vegetarianLunch';
-										} else if (
-											setMenu.Name.toLowerCase().indexOf('kevyt') > -1 ||
-											setMenu.Name.toLowerCase().indexOf('soup') > -1
-										) {
-											var type = 'lightLunch';
-										} else if (
-											setMenu.Name.toLowerCase().indexOf('grill') > -1 ||
-											setMenu.Name.toLowerCase().indexOf('erikois') > -1 ||
-											setMenu.Name.toLowerCase().indexOf('portion') > -1 ||
-											setMenu.Name.toLowerCase().indexOf('pitsa') > -1 ||
-											setMenu.Name.toLowerCase().indexOf('pizza') > -1 ||
-											setMenu.Name.toLowerCase().indexOf('bizza') > -1
-										) {
-											var type = 'grillLunch';
-										} else if (
-											setMenu.Name.toLowerCase().indexOf('herkuttelijan') > -1 ||
-											setMenu.Name.toLowerCase().indexOf('special') > -1
-										) {
-											var type = 'specialLunch';
-										} else if (
-											setMenu.Name.toLowerCase().indexOf('jälki') > -1 ||
-											setMenu.Name.toLowerCase().indexOf('dessert') > -1
-										) {
-											var type = 'dessert';
-										} else {
-											var type = 'lunch'
-										}
-
-										var components = [];
-
-										if (setMenu.Components instanceof Array) {
-											setMenu.Components.forEach(function(component) {
-												components.push({
-													name: component.replace(/ *\([^)]*\) */g, ""),
-													diets: component.match(/ *\([^)]*\) */g)
-												});
-											});
-										}
-
-										if (setMenu.Price) {
-											var price = setMenu.Price.replace(/€\/ /g, '€ / ').replace(/ €/g, '€');
-										} else {
-											var price = null;
-										}
-										
-										var set = {
-											type: type,
-											name: setMenu.Name,
-											price: price,
-											components: components
-										};
-
-										menuSets.push(set);
-									}.bind(this));
-							
-									if (JSON.stringify(menuSets) !== JSON.stringify(state.menuSets)) {
-										state.menuSets = menuSets;
-										stateNeedsUpdate = true;
-									}
-								}
-							}
-						}.bind(this));
-					}
-				}
-				
-				if (stateNeedsUpdate) {
-					this.setState(state);
+				switch (this.props.details.type) {
+					case 'amica':
+						this.parseAmicaMenu(data);
+						break;
+					case 'uniresta':
+						this.parseUnirestaMenu(data);
+						break;
 				}
 			}.bind(this),
 			error: function(xhr, status, err) {
-				console.error(this.state.dataFile, status, err.toString());
+				this.addErrorCard(null, 'menuDownloadError');
 			}.bind(this)
 		});
 	},
+	parseAmicaMenu: function(data) {
+		var state = this.state;
+		var stateNeedsUpdate = false;
+		var info = [];
+		var menuSets = [];
+		
+		if (data.MenusForDays instanceof Array) {
+			if (data.RestaurantUrl && data.RestaurantUrl !== state.url) {
+				state.url = data.RestaurantUrl;
+				stateNeedsUpdate = true;
+			}
+
+			if (data.MenusForDays instanceof Array) {
+				data.MenusForDays.forEach(function(menus) {
+					var menuDate = moment(menus.Date);
+					var currentDate = this.props.date;
+
+					if (menuDate.isSame(currentDate, 'day')) {
+						if (menus.LunchTime) {
+							info.push({type: 'lunchTime', content: menus.LunchTime});
+						}
+
+						if (menus.SetMenus instanceof Array) {
+							menus.SetMenus.forEach(function(setMenu) {
+								var type = this.getSetTypeFromName(setMenu.Name);
+								var components = [];
+
+								if (setMenu.Components instanceof Array) {
+									setMenu.Components.forEach(function(component) {
+										components.push({
+											name: component.replace(/ *\([^)]*\) */g, ""),
+											diets: component.match(/ *\([^)]*\) */g).shift().replace(/ ,/g, ', ').replace(/\*, /g, '')
+										});
+									});
+								}
+
+								if (setMenu.Price) {
+									var price = setMenu.Price.replace(/€\/ /g, '€ / ').replace(/ €/g, '€');
+								} else {
+									var price = null;
+								}
+
+								var set = {
+									type: type,
+									name: setMenu.Name,
+									price: price,
+									components: components
+								};
+
+								menuSets.push(set);
+							}.bind(this));
+						}
+					}
+				}.bind(this));
+			}
+		}
+	
+		if (menuSets.length == 0 && info.length == 0) {
+			info.push({type: 'menuUnavailable'});
+		}
+
+		if (JSON.stringify(info) !== JSON.stringify(state.info)) {
+			state.info = info;
+			stateNeedsUpdate = true;
+		}
+
+		if (JSON.stringify(menuSets) !== JSON.stringify(state.menuSets)) {
+			state.menuSets = menuSets;
+			stateNeedsUpdate = true;
+		}
+
+		if (stateNeedsUpdate) {
+			this.setState(state);
+		}
+	},
+	parseUnirestaMenu: function(data) {
+		var state = this.state;
+		var stateNeedsUpdate = false;
+		var info = [];
+		var menuSets = [];
+		var normalSets = [];
+		var specialSets = [];
+
+		if (data.page instanceof Object) {
+			if (data.page.link && data.page.link !== state.url) {
+				state.url = data.page.link;
+				stateNeedsUpdate = true;
+			}
+		}
+
+		if (data.sections instanceof Object) {
+			for (var key in data.sections) {
+				if (! data.sections.hasOwnProperty(key)) {
+					continue;
+				}
+
+				var obj = data.sections[key];
+
+				if (obj instanceof Array) {
+					var day = moment(this.props.date).locale('fi').format('dd');
+					
+					obj.forEach(function(menus) {
+						for (var menuKey in menus) {
+							if (! menus.hasOwnProperty(menuKey)) {
+								continue;
+							}
+
+							if (menuKey.indexOf(day + '-') == 0) {
+								if (menuKey.indexOf('ruokalaji') == 3 && menuKey.indexOf('-kalorit') == -1) {
+									var name = menuKey.slice(3).replace(/-/g, ' ');
+									var components = [];
+									var type = this.getSetTypeFromName(name);
+									
+									components.push({name: menus[menuKey].replace(/\(\[S\]\)/g, '').replace(/\[S\]/g, '').replace(/\s\.\s/g,'')});
+									
+									var set = {
+										type: type,
+										name: name.charAt(0).toUpperCase() + name.slice(1),
+										components: components
+									};
+
+									normalSets.push(set);
+								} else if (menuKey.indexOf('erikoisuudet') == 3 && menuKey.indexOf('-otsikot') == -1) {
+									if (menus[menuKey] instanceof Array) {
+										menus[menuKey].forEach(function(menu, menuNro) {
+											var titleKey = menuKey + '-otsikot';
+											
+											if (titleKey in menus && menuNro in menus[titleKey] && menus[titleKey][menuNro].length > 0) {
+												var name = menus[titleKey][menuNro].trim();
+											} else {
+												var name = null;
+											}
+										
+											var componentName = menu.replace(/\(\[S\]\)/g, '').replace(/\[S\]/g, '').replace(/\s\.\s/g,'').trim();
+											var openingWords = ['aukiolo', 'avoinna', 'loma'];
+
+											if (typeof name == 'string' && stringContains(name, openingWords)) {
+												info.push({type: 'openingHours', title: name, content: componentName});
+											} else if (stringContains(componentName, openingWords)) {
+												info.push({type: 'openingHours', content: componentName});
+											} else {
+												var type = this.getSetTypeFromName(name);
+												var components = [{name: componentName}];
+												
+												var set = {
+													type: type,
+													name: name,
+													components: components
+												};
+
+												specialSets.push(set);
+											}
+										}.bind(this));
+									}
+								}
+							}
+						}
+					}.bind(this));
+				}
+			}
+		}
+					
+		menuSets = normalSets.concat(specialSets);
+
+		if (menuSets.length == 0 && info.length == 0) {
+			info.push({type: 'menuUnavailable'});
+		}
+
+		if (JSON.stringify(info) !== JSON.stringify(state.info)) {
+			state.info = info;
+			stateNeedsUpdate = true;
+		}
+
+		if (JSON.stringify(menuSets) !== JSON.stringify(state.menuSets)) {
+			state.menuSets = menuSets;
+			stateNeedsUpdate = true;
+		}
+
+		if (stateNeedsUpdate) {
+			this.setState(state);
+		}
+	},
+	addErrorCard: function(title, content) {
+		var origInfo = this.state.info;
+		var newInfo = [{type: 'error', title: title, content: content}];
+
+		if (JSON.stringify(origInfo) !== JSON.stringify(newInfo)) {
+			var state = this.state;
+			state.info = newInfo;
+			this.setState(state);
+		}
+	},
+	getSetTypeFromName: function(name) {
+		var type = 'lunch'
+	
+		if (typeof name == 'string' && name.length > 0) {
+			if (stringContains(name, ['kasvis', 'vegetable', 'salaatti', 'salad'])) {
+				type = 'vegetarianLunch';
+			} else if (stringContains(name, ['kevyt', 'soup'])) {
+				type = 'lightLunch';
+			} else if (stringContains(name, ['grill', 'erikois', 'portion', 'pitsa', 'pizza', 'bizza'])) {
+				type = 'grillLunch';
+			} else if (stringContains(name, ['herkuttelijan', 'herkku', 'special'])) {
+				type = 'specialLunch';
+			} else if (stringContains(name, ['jälki', 'dessert'])) {
+				type = 'dessert';
+			} else if (stringContains(name, ['aamu', 'breakfast'])) {
+				type = 'breakfast';
+			}
+		}
+
+		return type;
+	},
 	render: function() {
 		var i = 0;
+		var j = 0;
+		var infoCards = [];
 
-		if (! this.state.lunchTime || typeof this.state.lunchTime == 'undefined' || this.state.lunchTime.length < 1) {
-			var lunchTime = translate('closed', this.props.language);
-			var lunchTimeCardClass = 'mdl-card mdl-shadow--2dp restaurant-additional-info mdl-card--red';
-		} else {
-			var lunchTime = this.state.lunchTime;
-			var lunchTimeCardClass = 'mdl-card mdl-shadow--2dp restaurant-additional-info mdl-card--green';
-		}
+		this.state.info.map(function(card) {
+			if (card.type == 'lunchTime' && typeof card.content == 'string' && card.content.length > 0) {
+				infoCards.push(<div key={this.props.name + '-card-' + j++} className='mdl-card mdl-shadow--2dp restaurant-additional-info mdl-card--slateblue'><div className="mdl-card__title restaurant-open"><i className="material-icons restaurant-open-icon">access_time</i><small className="restaurant-open-time">{card.content}</small></div></div>);
+			} else if (card.type == 'menuUnavailable') {
+				infoCards.push(<div key={this.props.name + '-card-' + j++} className='mdl-card mdl-shadow--2dp restaurant-additional-info mdl-card--grey'><div className="mdl-card__title"><small>{translate('menuUnavailable', this.props.language)}</small></div></div>);
+			} else if (card.type == 'openingHours') {
+				var cardTitle = null;
+				
+				if (typeof card.title == 'string' && card.title.length > 0) {
+					cardTitle = <strong>{card.title}<br /></strong>;
+				}
+				
+				infoCards.push(<div key={this.props.name + '-card-' + j++} className='mdl-card mdl-shadow--2dp restaurant-additional-info mdl-card--slateblue'><div className="mdl-card__title restaurant-open"><i className="material-icons restaurant-open-icon">access_time</i><small className="restaurant-open-time">{cardTitle}{card.content}</small></div></div>);
+			} else if (card.type == 'error') {
+				infoCards.push(<div key={this.props.name + '-card-' + j++} className='mdl-card mdl-shadow--2dp restaurant-additional-info mdl-card--red'><div className="mdl-card__title"><small>{translate('menuDownloadError', this.props.language)}</small></div></div>);
+			}
+		}.bind(this));
 
 		return (
 			<div className="mdl-cell mdl-cell--2-col mdl-cell--4-col-tablet mdl-cell--12-col-phone">
 				<div className="mdl-card mdl-shadow--2dp restaurant-info">
 					<div className="mdl-card__title mdl-card--expand">
-						<h3 className="mdl-card__title-text"><a href={this.state.url}><small>{this.props.details[this.props.language].type}</small><br />{this.props.details[this.props.language].name}</a></h3>
+						<h3 className="mdl-card__title-text"><a target="_blank" href={this.state.url}><small>{this.props.details[this.props.language].type}</small><br />{this.props.details[this.props.language].name}</a></h3>
 					</div>
 				</div>
-				<div className={lunchTimeCardClass}>
-					<div className="mdl-card__title restaurant-open">
-						<i className="material-icons restaurant-open-icon">access_time</i>
-						<small className="restaurant-open-time">{lunchTime}</small>
-					</div>
-				</div>
+				{infoCards.map(function(card) {
+					return card;
+				}.bind(this))}
 				{this.state.menuSets.map(function(menuSet) {
 					return <MenuSet key={this.props.name + '-menu-' + i++} type={menuSet.type} name={menuSet.name} price={menuSet.price} components={menuSet.components} />
 				}.bind(this))}
@@ -466,6 +647,9 @@ var MenuSet = React.createClass({
 			case 'dessert':
 				state.cssClasses += ' menu-set--dessert';
 				break;
+			case 'breakfast':
+				state.cssClasses += ' menu-set--breakfast';
+				break;
 		}
 
 		this.setState(state);
@@ -473,23 +657,29 @@ var MenuSet = React.createClass({
 	render: function() {
 		var i = 0;
 		var components = [];
-		
+		var title = null;
+		var price = null;
+
 		if (this.props.components instanceof Array) {
 			components = this.props.components;
 		}
 
+		if (typeof this.props.name == 'string' && this.props.name.length > 0) {
+			title = <div className="mdl-card__title menu-title"><h5 className="mdl-card__title-text">{this.props.name}</h5></div>;
+		}
+
+		if (typeof this.props.price == 'string' && this.props.price.length > 0) {
+			price = <div className="mdl-card__title menu-price"><h6 className="mdl-card__title-text">{this.props.price}</h6></div>;
+		}
+
 		return (
 			<div className={this.state.cssClasses}>
-				<div className="mdl-card__title menu-title">
-					<h5 className="mdl-card__title-text">{this.props.name}</h5>
-				</div>
-				<div className="mdl-card__title menu-price">
-					<h6 className="mdl-card__title-text">{this.props.price}</h6>
-				</div>
+				{title}
+				{price}
 				<div className="mdl-card__supporting-text menu-components">
 					<ul className="mdl-list">
 						{components.map(function(component) {
-							return <li key={this.key + '-component-' + i++} className="mdl-list__item">{component.name}</li>
+							return <li key={this.key + '-component-' + i++} className="mdl-list__item" title={component.diets}>{component.name}</li>
 						}.bind(this))}
 					</ul>
 				</div>
