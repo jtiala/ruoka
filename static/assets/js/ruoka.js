@@ -202,7 +202,7 @@ var Ad = React.createClass({
 		return (
 			<div className="mdl-grid">
 				<div className="mdl-cell mdl-cell--12-col" style={{height: '100px'}}>
-					<ins className="adsbygoogle" style={{display: 'block'}} data-ad-client="ca-pub-5168656039974650" data-ad-slot="3755321464" data-ad-format="auto"></ins>
+					<ins className="adsbygoogle" style={{display: 'block', textAlign: 'center'}} data-ad-client="ca-pub-5168656039974650" data-ad-slot="3755321464" data-ad-format="auto"></ins>
 				</div>
 			</div>
 		);
