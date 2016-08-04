@@ -111,7 +111,8 @@ var RuokaApp = React.createClass({
 						title: 'Lunch menus at Tecnology Village'
 					},
 					restaurants: [
-						{type: 'amica', name: 'smarthouse', fi: {type: 'Amica', name: 'Smarthouse'}, en: {type: 'Amica', name: 'Smarthouse'}}
+						{type: 'amica', name: 'smarthouse', fi: {type: 'Amica', name: 'Smarthouse'}, en: {type: 'Amica', name: 'Smarthouse'}},
+						{type: 'amica', name: 'garden', fi: {type: 'Amica', name: 'Garden'}, en: {type: 'Amica', name: 'Garden'}}
 					]
 				}
 			}
