@@ -21,7 +21,8 @@ class AmicaMenuDownloader extends MenuDownloader {
 		'0226' => 'alwari',
 		'0235' => 'kotkanpoika-kultturelli',
 		//Teknologiakylä
-		'3498' => 'smarthouse'
+		'3498' => 'smarthouse',
+		'3497' => 'garden'
 	);
 	public $downloadFolder = '../static/data/amica/';
 	
