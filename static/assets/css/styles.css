@@ -128,13 +128,13 @@
 		padding: 0 16px;
 	}
 
-@media only screen and (max-device-width: 839px) {
+@media only screen and (max-width: 839px) {
 	.navigation-dash {
 		display: none;
 	}
 }
 
-@media only screen and (max-device-width: 639px) {
+@media only screen and (max-width: 639px) {
 	.mdl-layout-title {
 		width: 100%;
 	}
