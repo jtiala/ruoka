@@ -1,44 +1,8 @@
-var translations = {
-	fi: {
-		closed: 'Suljettu',
-		menuUnavailable: 'Menu ei saatavissa.',
-		menuDownloadError: 'Menua ei voitu ladata.'
-	},
-	en: {
-		closed: 'Closed',
-		menuUnavailable: 'Menu unavailable.',
-		menuDownloadError: 'Menu could not be downloaded.'
-	}
-}
-
-var translate = function(name, language) {
-	if (translations[language] instanceof Object && typeof translations[language][name] == 'string') {
-		return translations[language][name];
-	}
-
-	return name;
-};
-
-var stringContains = function(string, contains) {
-	var ret = false;
-
-	if (! contains instanceof Array) {
-		contains = [contains];
-	}
-
-	contains.forEach(function(c) {
-		if (string.toLowerCase().indexOf(c.toLowerCase()) > -1) {
-			ret = true;
-		}
-	});
-
-	return ret;
-}
-
 var RuokaApp = React.createClass({
 	getDefaultProps: function() {
 		return {
-			appUrl: 'http://dev.ruoka.kitchen',
+			appName: config.appName,
+			appUrl: config.appUrl,
 			languages: {
 				fi: {
 					name: 'Suomi',
@@ -143,7 +107,7 @@ var RuokaApp = React.createClass({
 		this.setState(state);
 	},
 	updateBrowserTitle: function() {
-		var title = this.state.listings[this.state.currentListing][this.state.language].title + ', ' + this.state.date.locale(this.state.language).format('dd D.M.') + ' - Ruoka.kitchen';
+		var title = this.state.listings[this.state.currentListing][this.state.language].title + ', ' + this.state.date.locale(this.state.language).format('dd D.M.') + ' - ' + this.props.appName;
 		document.title = title;
 	},
 	updateBrowserHash: function() {
@@ -196,17 +160,30 @@ var RuokaApp = React.createClass({
 });
 
 var Ad = React.createClass({
+	hasAds: function() {
+		if (config.ads[0] instanceof Object) {
+			return true;
+		}
+		
+		return false;
+	},
 	componentDidMount: function() {
-		(adsbygoogle = window.adsbygoogle || []).push({});
+		if (this.hasAds()) {
+			(adsbygoogle = window.adsbygoogle || []).push({});
+		}
 	},
 	render: function() {
-		return (
-			<div className="mdl-grid">
-				<div className="mdl-cell mdl-cell--12-col" style={{height: '100px'}}>
-					<ins className="adsbygoogle" style={{display: 'block', textAlign: 'center'}} data-ad-client="ca-pub-5168656039974650" data-ad-slot="3755321464" data-ad-format="auto"></ins>
+		if (this.hasAds()) {
+			return (
+				<div className="mdl-grid">
+					<div className="mdl-cell mdl-cell--12-col" style={{height: '100px'}}>
+						<ins className="adsbygoogle" style={{display: 'block', textAlign: 'center'}} data-ad-client={config.ads[0].adClient} data-ad-slot={config.ads[0].adSlot} data-ad-format="auto"></ins>
+					</div>
 				</div>
-			</div>
-		);
+			);
+		} else {
+			return (<div></div>);
+		}
 	}
 });
 
