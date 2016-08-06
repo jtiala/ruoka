@@ -11,7 +11,7 @@ class UnirestaMenuDownloader extends MenuDownloader {
 		'medisiina' => 'medisiina',
 		'castanea' => 'castanea'
 	);
-	public $downloadFolder = '../static/data/uniresta/';
+	public $downloadFolder = '../public_html/data/uniresta/';
 	
 	public function download() {
 		$currentWeek = date('Y-m-d', strtotime('this week', time()));

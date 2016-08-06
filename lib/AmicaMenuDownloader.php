@@ -24,7 +24,7 @@ class AmicaMenuDownloader extends MenuDownloader {
 		'3498' => 'smarthouse',
 		'3497' => 'garden'
 	);
-	public $downloadFolder = '../static/data/amica/';
+	public $downloadFolder = '../public_html/data/amica/';
 	
 	public function download() {
 		$currentDay = date('w');
