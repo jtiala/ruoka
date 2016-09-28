@@ -446,68 +446,75 @@ var Restaurant = React.createClass({
 
 				if (obj instanceof Array) {
 					var day = moment(this.props.date).locale('fi').format('dd');
-					
+					var loops = 0;
+
 					obj.forEach(function(menus) {
-						for (var menuKey in menus) {
-							if (! menus.hasOwnProperty(menuKey)) {
-								continue;
-							}
+						
+						//Show only first weeks menu if multiple are present
+						if (loops < 1) {
+							loops++;
 
-							if (menuKey.indexOf(day + '-') == 0) {
-								if (menuKey.indexOf('ruokalaji') == 3 && menuKey.indexOf('-kalorit') == -1) {
-									var name = menuKey.slice(3).replace(/-/g, ' ');
-									var components = [];
-									var type = this.getSetTypeFromName(name);
-									
-									components.push({name: menus[menuKey].replace(/\(\[S\]\)/g, '').replace(/\[S\]/g, '').replace(/\s\.\s/g,'')});
-									
-									var set = {
-										type: type,
-										name: name.charAt(0).toUpperCase() + name.slice(1),
-										components: components
-									};
+							for (var menuKey in menus) {
+								if (! menus.hasOwnProperty(menuKey)) {
+									continue;
+								}
 
-									normalSets.push(set);
-								} else if (menuKey.indexOf('erikoisuudet') == 3 && menuKey.indexOf('-otsikot') == -1) {
-									if (menus[menuKey] instanceof Array) {
-										menus[menuKey].forEach(function(menu, menuNro) {
-											var titleKey = menuKey + '-otsikot';
-											
-											if (titleKey in menus && menuNro in menus[titleKey] && menus[titleKey][menuNro].length > 0) {
-												var name = menus[titleKey][menuNro].trim();
-											} else {
-												var name = null;
-											}
-										
-											var componentName = menu.replace(/\(\[S\]\)/g, '').replace(/\[S\]/g, '').replace(/\s\.\s/g,'').trim();
-											var openingWords = ['aukiolo', 'avoinna', 'loma'];
+								if (menuKey.indexOf(day + '-') == 0) {
+									if (menuKey.indexOf('ruokalaji') == 3 && menuKey.indexOf('-kalorit') == -1) {
+										var name = menuKey.slice(3).replace(/-/g, ' ');
+										var components = [];
+										var type = this.getSetTypeFromName(name);
 
-											if (typeof name == 'string' && stringContains(name, openingWords)) {
-												info.push({type: 'openingHours', title: name, content: componentName});
-											} else if (stringContains(componentName, openingWords)) {
-												info.push({type: 'openingHours', content: componentName});
-											} else {
-												var type = this.getSetTypeFromName(name);
-												var components = [{name: componentName}];
-												
-												var set = {
-													type: type,
-													name: name,
-													components: components
-												};
+										components.push({name: menus[menuKey].replace(/\(\[S\]\)/g, '').replace(/\[S\]/g, '').replace(/\s\.\s/g,'')});
 
-												specialSets.push(set);
-											}
-										}.bind(this));
+										var set = {
+											type: type,
+											name: name.charAt(0).toUpperCase() + name.slice(1),
+											components: components
+										};
+
+										normalSets.push(set);
+									} else if (menuKey.indexOf('erikoisuudet') == 3 && menuKey.indexOf('-otsikot') == -1) {
+										if (menus[menuKey] instanceof Array) {
+											menus[menuKey].forEach(function(menu, menuNro) {
+												var titleKey = menuKey + '-otsikot';
+
+												if (titleKey in menus && menuNro in menus[titleKey] && menus[titleKey][menuNro].length > 0) {
+													var name = menus[titleKey][menuNro].trim();
+												} else {
+													var name = null;
+												}
+
+												var componentName = menu.replace(/\(\[S\]\)/g, '').replace(/\[S\]/g, '').replace(/\s\.\s/g,'').trim();
+												var openingWords = ['aukiolo', 'avoinna', 'loma'];
+
+												if (typeof name == 'string' && stringContains(name, openingWords)) {
+													info.push({type: 'openingHours', title: name, content: componentName});
+												} else if (stringContains(componentName, openingWords)) {
+													info.push({type: 'openingHours', content: componentName});
+												} else {
+													var type = this.getSetTypeFromName(name);
+													var components = [{name: componentName}];
+
+													var set = {
+														type: type,
+														name: name,
+														components: components
+													};
+
+													specialSets.push(set);
+												}
+											}.bind(this));
+										}
 									}
 								}
 							}
-						}
+						}	
 					}.bind(this));
 				}
 			}
 		}
-					
+		
 		menuSets = normalSets.concat(specialSets);
 
 		if (menuSets.length == 0 && info.length == 0) {
