@@ -1,2 +1,3 @@
-# ruoka
-Web app for showing lunch menus from different restaurants all over Oulu, Finland. 
+# Deprecated
+
+This repository has been replaced by [lunchwatch-client](https://github.com/jtiala/lunchwatch-client).
